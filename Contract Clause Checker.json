@@ -1,0 +1,292 @@
+{
+  "name": "Contract Clause Checker",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Contract Clause Checker",
+        "formDescription": "Upload a contract or policy document and get an instant, automated risk review — flagged clauses, plain-English summaries, and a full report sent straight to your inbox.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload your document",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Where should we send your results?",
+              "placeholder": "you@example.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Contract"
+                  },
+                  {
+                    "option": "NDA"
+                  },
+                  {
+                    "option": "Policy / Internal Docuemnt"
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Review My Document",
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Your document is being reviewed now. You'll receive a full risk summary by email in just a moment."
+            }
+          },
+          "customCss": ":root {\n\t--font-family: 'Open Sans', sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\t--font-size-body: 12px;\n\t--font-size-label: 14px;\n\t--font-size-test-notice: 12px;\n\t--font-size-input: 14px;\n\t--font-size-header: 22px;\n\t--font-size-paragraph: 14px;\n\t--font-size-link: 12px;\n\t--font-size-error: 12px;\n\t--font-size-html-h1: 28px;\n\t--font-size-html-h2: 20px;\n\t--font-size-html-h3: 16px;\n\t--font-size-html-h4: 14px;\n\t--font-size-html-h5: 12px;\n\t--font-size-html-h6: 10px;\n\t--font-size-subheader: 14px;\n\n\t/* Colors — navy & gold \"legal tool\" theme */\n\t--color-background: #f4f6f9;\n\t--color-test-notice-text: #e6a23d;\n\t--color-test-notice-bg: #fefaf6;\n\t--color-test-notice-border: #f6dcb7;\n\t--color-card-bg: #ffffff;\n\t--color-card-border: #dbdfe7;\n\t--color-card-shadow: rgba(26, 43, 76, 0.08);\n\t--color-link: #7e8186;\n\t--color-header: #1a2b4c;\n\t--color-label: #333333;\n\t--color-input-border: #d3d8e0;\n\t--color-input-text: #333333;\n\t--color-focus-border: #1a2b4c;\n\t--color-submit-btn-bg: #1a2b4c;\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ea1f30;\n\t--color-required: #c9a24b;\n\t--color-clear-button-bg: #7e8186;\n\t--color-html-text: #555;\n\t--color-html-link: #c9a24b;\n\t--color-header-subtext: #6b7280;\n\n\t/* Border Radii */\n\t--border-radius-card: 10px;\n\t--border-radius-input: 8px;\n\t--border-radius-clear-btn: 50%;\n\t--card-border-radius: 10px;\n\n\t/* Spacing */\n\t--padding-container-top: 24px;\n\t--padding-card: 28px;\n\t--padding-test-notice-vertical: 12px;\n\t--padding-test-notice-horizontal: 24px;\n\t--margin-bottom-card: 16px;\n\t--padding-form-input: 12px;\n\t--card-padding: 28px;\n\t--card-margin-bottom: 16px;\n\n\t/* Dimensions */\n\t--container-width: 460px;\n\t--submit-btn-height: 48px;\n\t--checkbox-size: 18px;\n\n\t/* Others */\n\t--box-shadow-card: 0px 6px 20px 0px var(--color-card-shadow);\n\t--opacity-placeholder: 0.5;\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "ad2b302f-e199-404d-881a-b02f6a289578",
+      "name": "On form submission",
+      "webhookId": "4e41e4ea-cb62-4400-9676-5dfb1e013e4b"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Upload_your_document",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        0
+      ],
+      "id": "6e89c6ec-4e70-4f86-bc0f-99f630badf96",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.recipient_email }}",
+        "subject": "Your Contract Review Results",
+        "message": "={{ $json.html_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "30ee9cf3-0e49-4edc-aae0-244b78c4bba4",
+      "name": "Send a message",
+      "webhookId": "c081dea9-72a0-4385-9ea2-fb629b79d804",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q8G3gOov5Akm7Ggb",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const highRiskPhrases = [\n  \"sole discretion\", \"without notice\", \"waives all rights\", \"non-refundable\",\n  \"indemnify\", \"hold harmless\", \"irrevocably\", \"perpetual\", \"royalty-free\",\n  \"no liability\", \"as is\", \"without limitation\", \"exclusive property\",\n  \"non-compete\", \"liquidated damages\", \"unilaterally\"\n];\n\nconst mediumRiskPhrases = [\n  \"may terminate\", \"reasonable satisfaction\", \"at any time\", \"confidential\",\n  \"governing law\", \"amendments\", \"assign\", \"third party\"\n];\n\nreturn $input.all().map(item => {\n  const clauseText = item.json.clause_text;\n  const clauseNumber = item.json.clause_number;\n  const lowerText = clauseText.toLowerCase();\n\n  const matchedHigh = highRiskPhrases.filter(p => lowerText.includes(p));\n  const matchedMedium = mediumRiskPhrases.filter(p => lowerText.includes(p));\n\n  let risk_level = \"low\";\n  let explanation = \"No flagged terms found in this clause.\";\n\n  if (matchedHigh.length > 0) {\n    risk_level = \"high\";\n    explanation = `Contains high-risk terms: ${matchedHigh.join(\", \")}`;\n  } else if (matchedMedium.length > 0) {\n    risk_level = \"medium\";\n    explanation = `Contains terms worth reviewing: ${matchedMedium.join(\", \")}`;\n  }\n\n  return {\n    json: {\n      clause_number: clauseNumber,\n      clause_text: clauseText,\n      risk_level,\n      explanation\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        0
+      ],
+      "id": "9ab70bdd-ae45-4e8a-96f4-a66e530e1846",
+      "name": "classify risk"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst highRisk = items.filter(i => i.json.risk_level === \"high\");\nconst mediumRisk = items.filter(i => i.json.risk_level === \"medium\");\n\nfunction clauseRow(i, color) {\n  return `\n    <div style=\"border-left: 4px solid ${color}; padding: 10px 15px; margin-bottom: 12px; background:#fafafa;\">\n      <b>Clause ${i.json.clause_number}</b> — ${i.json.explanation}\n      <p style=\"color:#555; font-size: 13px; margin: 6px 0 0;\">\"${i.json.clause_text.substring(0, 150)}...\"</p>\n    </div>`;\n}\n\nconst html = `\n<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: auto; color:#222;\">\n  <h2 style=\"border-bottom:2px solid #333; padding-bottom:8px;\">📄 Document Review Summary</h2>\n  <p><b>Total clauses reviewed:</b> ${items.length}</p>\n  <p><b style=\"color:#c0392b;\">High-risk clauses:</b> ${highRisk.length}</p>\n  <p><b style=\"color:#e67e22;\">Medium-risk clauses:</b> ${mediumRisk.length}</p>\n\n  ${highRisk.length > 0 ? `<h3 style=\"color:#c0392b;\">🔴 High Risk Clauses</h3>${highRisk.map(i => clauseRow(i, \"#c0392b\")).join(\"\")}` : \"\"}\n\n  ${mediumRisk.length > 0 ? `<h3 style=\"color:#e67e22;\">🟠 Medium Risk Clauses</h3>${mediumRisk.map(i => clauseRow(i, \"#e67e22\")).join(\"\")}` : \"\"}\n\n  <p style=\"color:#888; font-size:12px; margin-top:30px;\">Generated automatically by your Contract Clause Checker workflow.</p>\n</div>\n`;\n\nreturn {\n  json: {\n    html_body: html,\n    high_risk_count: highRisk.length,\n    medium_risk_count: mediumRisk.length,\n    recipient_email: $('On form submission').first().json['Where should we send your results?']\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        0
+      ],
+      "id": "a2d4aeb8-9fde-4a9e-a839-366dfad31bb0",
+      "name": "build summary"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ad3d9f3c-7e5a-4a8b-a165-3893678cb2da",
+              "leftValue": "={{ $json.text.trim().length }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        240
+      ],
+      "id": "13902079-bea5-454d-a1fa-ad9ef42d4739",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').first().json['Where should we send your results?'] }}",
+        "subject": "We couldn't read your document",
+        "message": "We weren't able to extract text from your document. This usually happens with scanned or image-based PDFs. Please try uploading a document with selectable text instead.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        256
+      ],
+      "id": "eb951741-a671-403b-b7ce-55cd98383f5b",
+      "name": "Send a message2",
+      "webhookId": "6e866e7e-170f-45d5-9c1c-ed040f57db27",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q8G3gOov5Akm7Ggb",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the extracted text from the previous node\nconst text = $input.first().json.text;\n\n// Split into clauses using numbered patterns (e.g., \"1.\", \"2.\", \"Section 1\", etc.)\n// This regex splits on a newline followed by a number and a period, or common section headers\nconst clauseSplitRegex = /\\n(?=\\d+\\.\\s)|\\n(?=Section\\s+\\d+)/gi;\n\nlet clauses = text.split(clauseSplitRegex)\n  .map(c => c.trim())\n  .filter(c => c.length > 20); // filter out tiny fragments/empty lines\n\n// If splitting didn't work well (e.g., only 1 clause found), fall back to splitting by double line breaks\nif (clauses.length <= 1) {\n  clauses = text.split(/\\n\\s*\\n/)\n    .map(c => c.trim())\n    .filter(c => c.length > 20);\n}\n\n// Return each clause as a separate item so we can loop over them next\nreturn clauses.map((clause, index) => ({\n  json: {\n    clause_number: index + 1,\n    clause_text: clause\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        0
+      ],
+      "id": "32859f92-2815-4f60-9ad8-05aa64af82ba",
+      "name": "Split into clauses"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classify risk": {
+      "main": [
+        [
+          {
+            "node": "build summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "build summary": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Split into clauses",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split into clauses": {
+      "main": [
+        [
+          {
+            "node": "classify risk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b39c2120-f7bd-45ab-b956-c023ace4c6ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8a64d80d8d1e1d65fa6a1348439c2988a81f8bd657d7412b607d77fb3a0b075"
+  },
+  "nodeGroups": [],
+  "id": "OaNwElUav60H2FV2",
+  "tags": []
+}
